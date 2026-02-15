@@ -5,193 +5,174 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>My Ritual 🌳</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        :root { --primary: #A8E063; --secondary: #F7FF00; --bg: #f9fbf2; --card: #ffffff; --text: #2d3436; }
-        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
-        .tab-bar { display: flex; background: #fff; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .tab-item { flex: 1; text-align: center; padding: 18px 0; font-size: 0.9rem; font-weight: bold; color: #aaa; cursor: pointer; border-bottom: 4px solid transparent; }
+        :root { --primary: #A8E063; --bg: #f9fbf2; --card: #ffffff; --text: #2d3436; }
+        body { font-family: sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
+        .tab-bar { display: flex; background: #fff; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .tab-item { flex: 1; text-align: center; padding: 18px 0; font-weight: bold; color: #bbb; cursor: pointer; transition: 0.3s; }
         .tab-item.active { color: #556b2f; border-bottom: 4px solid var(--primary); }
-        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
-        .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 25px; border-radius: 24px; text-align: center; box-shadow: 0 8px 20px rgba(168, 224, 99, 0.2); margin-bottom: 25px; }
-        .section-name { font-weight: bold; color: #556b2f; margin-bottom: 12px; display: block; border-left: 5px solid var(--primary); padding-left: 12px; font-size: 1.1rem; }
-        .task-card { background: var(--card); padding: 12px 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 10px rgba(0,0,0,0.04); }
-        .task-info { display: flex; align-items: center; flex-grow: 1; }
-        .task-icon { font-size: 1.2rem; margin-right: 10px; }
-        .task-text { border: none; font-size: 1.05rem; background: transparent; color: var(--text); width: 100%; }
-        .btns { display: flex; gap: 6px; }
-        button { border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
-        .done-btn { background: #f0f0f0; color: #888; }
-        .is-done { background: #55efc4 !important; color: white; }
-        .leave-btn { background: #fff9db; color: #e67e22; }
-        .is-leave { background: #fab1a0 !important; color: white; text-decoration: line-through; }
-        .summary-card { background: var(--card); padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .stat-item { background: #f1f8e9; padding: 15px; border-radius: 12px; text-align: center; }
-        .stat-num { font-size: 1.5rem; font-weight: bold; color: #388e3c; display: block; }
-        .month-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .container { padding: 20px; max-width: 500px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #A8E063, #F7FF00); padding: 25px; border-radius: 24px; text-align: center; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(168,224,99,0.3); }
+        .section-name { font-weight: bold; color: #556b2f; margin: 20px 0 10px; display: block; border-left: 5px solid var(--primary); padding-left: 10px; }
+        .task-card { background: var(--card); padding: 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.04); }
+        .task-input { border: none; font-size: 1.1rem; width: 60%; background: transparent; color: var(--text); }
+        .btns button { border: none; padding: 10px 16px; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .done { background: #55efc4; color: white; }
+        .pending { background: #f0f0f0; color: #aaa; }
+        .stat-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .stat-item { background: #f1f8e9; padding: 12px; border-radius: 12px; text-align: center; }
+        .stat-num { font-size: 1.4rem; font-weight: bold; color: #388e3c; display: block; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div class="tab-bar">
-    <div class="tab-item active" onclick="switchTab(event, 'daily')">Daily Ritual 🌿</div>
-    <div class="tab-item" onclick="switchTab(event, 'weekly')">Weekly Recap 🍏</div>
-    <div class="tab-item" onclick="switchTab(event, 'monthly')">Monthly Recap 🍎</div>
+    <div class="tab-item active" onclick="showTab('daily')">Daily 🌿</div>
+    <div class="tab-item" onclick="showTab('weekly')">Weekly 🍏</div>
+    <div class="tab-item" onclick="showTab('monthly')">Monthly 🍎</div>
 </div>
 
 <div class="container">
     <div class="header">
-        <h1>My Ritual 🌳</h1>
-        <div id="display-date" style="font-size: 1rem; margin-top: 8px; font-weight: bold;"></div>
+        <h1 style="margin:0; font-size:1.8rem;">My Ritual 🌳</h1>
+        <div id="today-date" style="font-weight:bold; margin-top:5px; opacity:0.8;"></div>
     </div>
 
     <div id="tab-daily">
-        <div id="app-tasks"></div>
+        <div id="task-list"></div>
+        <div style="height:50px;"></div>
     </div>
 
     <div id="tab-weekly" class="hidden">
-        <div class="summary-card">
-            <span class="section-name">📅 本週週期</span>
-            <div id="week-dates" style="font-size: 1.4rem; font-weight: bold; color: #556b2f; margin: 10px 0;"></div>
-            <span class="section-name">📊 本週累積成果</span>
-            <div class="stat-grid">
-                <div class="stat-item"><span>📖 讀書</span><span class="stat-num" id="w-study">0</span></div>
-                <div class="stat-item"><span>💼 工作</span><span class="stat-num" id="w-work">0</span></div>
-                <div class="stat-item"><span>🐝 雜項</span><span class="stat-num" id="w-misc">0</span></div>
-                <div class="stat-item"><span>👁️ 眼部</span><span class="stat-num" id="w-eye">0</span></div>
-            </div>
+        <div class="stat-card">
+            <span class="section-name">📅 本週週期 (Mon-Fri)</span>
+            <div id="week-range" style="font-size:1.5rem; font-weight:bold; color:#556b2f; margin:10px 0;"></div>
+            <span class="section-name">📊 自動統計成果</span>
+            <div class="stat-grid" id="week-stats"></div>
         </div>
     </div>
 
     <div id="tab-monthly" class="hidden">
-        <div class="summary-card">
-            <span class="section-name">🍎 2026 年度月報</span>
-            <div id="month-list"></div>
+        <div class="stat-card">
+            <span class="section-name">🍎 2026 年度累計</span>
+            <div id="month-display"></div>
         </div>
+        <button onclick="if(confirm('確定要清除所有紀錄重來嗎？')){localStorage.clear();location.reload();}" style="width:100%; background:none; border:none; color:#ccc; font-size:0.8rem;">重置系統數據</button>
     </div>
 </div>
 
 <script>
-    const sections = [
-        { name: "☀️ 早上", tasks: [{id:"m1", i:"📖"}, {id:"m2", i:"📖"}, {id:"m3", i:"💼"}, {id:"m4", i:"👁️"}] },
-        { name: "☕ 下午", tasks: [{id:"a1", i:"📖"}, {id:"a2", i:"📖"}, {id:"a3", i:"💼"}, {id:"a4", i:"👁️"}] },
-        { name: "🌙 晚上", tasks: [{id:"e1", i:"📖"}, {id:"e2", i:"📖"}, {id:"e3", i:"🐝"}, {id:"e4", i:"👁️"}] }
+    // 1. 任務結構定義
+    const config = [
+        { s: "☀️ 早上", ts: ["📖", "📖", "💼", "👁️"] },
+        { s: "☕ 下午", ts: ["📖", "📖", "💼", "👁️"] },
+        { s: "🌙 晚上", ts: ["📖", "📖", "🐝", "👁️"] }
     ];
 
+    // 2. 日期運算
     const now = new Date();
-    const currentMonth = now.getMonth() + 1;
-    const currentYear = 2026;
+    const y = now.getFullYear();
+    const m = now.getMonth() + 1;
+    const d = now.getDate();
+    const todayId = `${y}-${m}-${d}`;
 
-    // 日期顯示
-    document.getElementById('display-date').innerText = now.toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'long' });
-    
-    function updateWeekDates() {
-        let d = new Date();
-        d.setDate(d.getDate() - d.getDay() + 1);
-        let start = `${d.getMonth()+1}/${d.getDate()}`;
-        d.setDate(d.getDate() + 4);
-        let end = `${d.getMonth()+1}/${d.getDate()}`;
-        document.getElementById('week-dates').innerText = `${start} - ${end}`;
-        return `${currentYear}-W${Math.ceil(now.getDate() / 7)}`;
+    // 計算本週一到週五的格式 2/16 - 2/20
+    function getWeekInfo() {
+        let day = now.getDay() || 7; 
+        let monday = new Date(now);
+        monday.setDate(now.getDate() - day + 1);
+        let friday = new Date(monday);
+        friday.setDate(monday.getDate() + 4);
+        return {
+            range: `${monday.getMonth()+1}/${monday.getDate()} - ${friday.getMonth()+1}/${friday.getDate()}`,
+            id: `W-${monday.getMonth()+1}${monday.getDate()}`
+        };
     }
+    const week = getWeekInfo();
 
-    // 資料初始化
-    let userTasks = JSON.parse(localStorage.getItem('ritual_tasks')) || {};
-    let dailyStatus = JSON.parse(localStorage.getItem('ritual_daily_status')) || {};
-    let stats = JSON.parse(localStorage.getItem('ritual_stats_2026')) || {
-        weekId: updateWeekDates(),
-        w: {📖:0, 💼:0, 🐝:0, 👁️:0},
-        m: {} // 格式 { "2": {📖:0...} }
-    };
+    // 3. 資料讀取 (使用版本號避免衝突)
+    let tasks = JSON.parse(localStorage.getItem('ritual_txt_v5')) || {};
+    let dailyStatus = JSON.parse(localStorage.getItem('ritual_status_v5')) || {};
+    let stats = JSON.parse(localStorage.getItem('ritual_stats_v5')) || { weekId: week.id, w: {"📖":0,"💼":0,"🐝":0,"👁️":0}, m: {} };
 
-    // 每週自動重置檢測
-    const thisWeekId = updateWeekDates();
-    if (stats.weekId !== thisWeekId) {
-        stats.w = {📖:0, 💼:0, 🐝:0, 👁️:0};
-        stats.weekId = thisWeekId;
-        dailyStatus = {}; // 新的一週也清空每日勾選
-        localStorage.setItem('ritual_daily_status', JSON.stringify({}));
+    // 自動換週重置
+    if (stats.weekId !== week.id) {
+        stats.w = {"📖":0,"💼":0,"🐝":0,"👁️":0};
+        stats.weekId = week.id;
+        dailyStatus = {}; // 換週時清空每日狀態
+        save();
     }
-    if (!stats.m[currentMonth]) stats.m[currentMonth] = {📖:0, 💼:0, 🐝:0, 👁️:0};
+    if (!stats.m[m]) stats.m[m] = {"📖":0,"💼":0,"🐝":0,"👁️":0};
 
-    function switchTab(e, tab) {
-        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
-        e.currentTarget.classList.add('active');
-        ['daily', 'weekly', 'monthly'].forEach(t => document.getElementById('tab-'+t).classList.add('hidden'));
-        document.getElementById('tab-'+tab).classList.remove('hidden');
-        if(tab === 'weekly') updateWeekStats();
-        if(tab === 'monthly') renderMonthly();
-    }
-
-    function renderTasks() {
-        const container = document.getElementById('app-tasks');
-        container.innerHTML = '';
-        sections.forEach(sec => {
-            let html = `<div class="section-box"><span class="section-name">${sec.name}</span>`;
-            sec.tasks.forEach(t => {
-                const status = dailyStatus[t.id] || 'pending';
-                const text = userTasks[t.id] || (t.i === '👁️' ? '眼部放鬆' : '點擊輸入任務');
+    // 4. 畫面渲染
+    function render() {
+        document.getElementById('today-date').innerText = now.toLocaleDateString('zh-TW', {month:'long', day:'numeric', weekday:'long'});
+        let html = '';
+        config.forEach((sec, sIdx) => {
+            html += `<span class="section-name">${sec.s}</span>`;
+            sec.ts.forEach((icon, tIdx) => {
+                let id = `t-${sIdx}-${tIdx}`;
+                let st = dailyStatus[todayId] && dailyStatus[todayId][id] ? 'done' : 'pending';
+                let val = tasks[id] || (icon === '👁️' ? '眼部放鬆' : (icon === '🐝' ? '雜項' : '讀書/工作內容'));
                 html += `
-                <div class="task-card">
-                    <div class="task-info"><span class="task-icon">${t.i}</span>
-                    <input class="task-text" value="${text}" onchange="saveText('${t.id}', this.value)"></div>
-                    <div class="btns">
-                        <button class="done-btn ${status === 'done' ? 'is-done' : ''}" onclick="toggle('${t.id}', 'done', '${t.i}')">完成</button>
-                        <button class="leave-btn ${status === 'leave' ? 'is-leave' : ''}" onclick="toggle('${t.id}', 'leave')">請假</button>
-                    </div>
-                </div>`;
+                    <div class="task-card">
+                        <span>${icon}</span>
+                        <input class="task-input" value="${val}" onchange="saveTxt('${id}', this.value)">
+                        <button class="${st}" onclick="toggle('${id}', '${icon}')">${st === 'done' ? '已完成' : '完成'}</button>
+                    </div>`;
             });
-            container.innerHTML += html + `</div>`;
         });
+        document.getElementById('task-list').innerHTML = html;
     }
 
-    window.saveText = (id, val) => { userTasks[id] = val; localStorage.setItem('ritual_tasks', JSON.stringify(userTasks)); };
+    window.saveTxt = (id, v) => { tasks[id] = v; localStorage.setItem('ritual_txt_v5', JSON.stringify(tasks)); };
 
-    window.toggle = (id, type, icon) => {
-        const prev = dailyStatus[id];
-        if (prev === type) {
-            dailyStatus[id] = 'pending';
-            if (type === 'done') adj(icon, -1);
-        } else {
-            dailyStatus[id] = type;
-            if (type === 'done') adj(icon, 1);
-            if (prev === 'done') adj(icon, -1);
-        }
-        localStorage.setItem('ritual_daily_status', JSON.stringify(dailyStatus));
-        renderTasks();
+    window.toggle = (tid, icon) => {
+        if (!dailyStatus[todayId]) dailyStatus[todayId] = {};
+        let isDone = dailyStatus[todayId][tid] === true;
+        
+        // 切換狀態與統計
+        dailyStatus[todayId][tid] = !isDone;
+        let val = !isDone ? 1 : -1;
+        stats.w[icon] += val;
+        stats.m[m][icon] += val;
+
+        save();
+        render();
     };
 
-    function adj(icon, v) {
-        if (stats.w[icon] !== undefined) stats.w[icon] += v;
-        if (stats.m[currentMonth][icon] !== undefined) stats.m[currentMonth][icon] += v;
-        localStorage.setItem('ritual_stats_2026', JSON.stringify(stats));
+    function save() {
+        localStorage.setItem('ritual_status_v5', JSON.stringify(dailyStatus));
+        localStorage.setItem('ritual_stats_v5', JSON.stringify(stats));
     }
 
-    function updateWeekStats() {
-        document.getElementById('w-study').innerText = stats.w['📖'];
-        document.getElementById('w-work').innerText = stats.w['💼'];
-        document.getElementById('w-misc').innerText = stats.w['🐝'];
-        document.getElementById('w-eye').innerText = stats.w['👁️'];
-    }
-
-    function renderMonthly() {
-        const list = document.getElementById('month-list');
-        list.innerHTML = '';
-        Object.keys(stats.m).sort((a,b)=>b-a).forEach(m => {
-            const d = stats.m[m];
-            list.innerHTML += `
-            <div style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                <b style="color:#556b2f">${m}月成果</b>
-                <div style="display:flex; gap:15px; font-size:0.9rem; margin-top:5px;">
-                    <span>📖 ${d['📖']}</span><span>💼 ${d['💼']}</span><span>🐝 ${d['🐝']}</span><span>👁️ ${d['👁️']}</span>
+    window.showTab = (t) => {
+        document.querySelectorAll('.tab-item').forEach(i => i.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+        ['daily', 'weekly', 'monthly'].forEach(x => document.getElementById('tab-'+x).classList.add('hidden'));
+        document.getElementById('tab-'+t).classList.remove('hidden');
+        
+        if (t === 'weekly') {
+            document.getElementById('week-range').innerText = week.range;
+            document.getElementById('week-stats').innerHTML = Object.entries(stats.w).map(([icon, count]) => 
+                `<div class="stat-item"><span>${icon} 累積</span><span class="stat-num">${count}</span></div>`
+            ).join('');
+        }
+        if (t === 'monthly') {
+            document.getElementById('month-display').innerHTML = Object.entries(stats.m).sort((a,b)=>b[0]-a[0]).map(([mon, data]) => `
+                <div style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                    <b style="color:#556b2f; font-size:1.1rem;">${mon}月 總結報表</b>
+                    <div class="stat-grid">
+                        ${Object.entries(data).map(([i, c]) => `<span>${i} ${c}</span>`).join('')}
+                    </div>
                 </div>
-            </div>`;
-        });
-    }
+            `).join('');
+        }
+    };
 
-    renderTasks();
+    render();
 </script>
 </body>
 </html>
