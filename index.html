@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Ritual 🌳</title>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        :root { --primary: #A8E063; --secondary: #F7FF00; --bg: #f9fbf2; --card: #ffffff; --text: #2d3436; }
+        body { font-family: -apple-system, sans-serif; background: var(--bg); margin: 0; padding: 0; color: var(--text); }
+        .tab-bar { display: flex; background: #fff; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .tab-item { flex: 1; text-align: center; padding: 18px 0; font-size: 0.9rem; font-weight: bold; color: #aaa; cursor: pointer; border-bottom: 4px solid transparent; }
+        .tab-item.active { color: #556b2f; border-bottom: 4px solid var(--primary); }
+        .container { padding: 20px; max-width: 600px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, var(--primary), var(--secondary)); padding: 25px; border-radius: 24px; text-align: center; box-shadow: 0 8px 20px rgba(168, 224, 99, 0.2); margin-bottom: 25px; }
+        .section-name { font-weight: bold; color: #556b2f; margin-bottom: 12px; display: block; border-left: 5px solid var(--primary); padding-left: 12px; font-size: 1.1rem; }
+        .task-card { background: var(--card); padding: 12px 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 3px 10px rgba(0,0,0,0.04); }
+        .task-info { display: flex; align-items: center; flex-grow: 1; }
+        .task-icon { font-size: 1.2rem; margin-right: 10px; }
+        .task-text { border: none; font-size: 1.05rem; background: transparent; color: var(--text); width: 100%; }
+        .btns { display: flex; gap: 6px; }
+        button { border: none; padding: 8px 12px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 0.8rem; }
+        .done-btn { background: #f0f0f0; color: #888; }
+        .is-done { background: #55efc4 !important; color: white; }
+        .leave-btn { background: #fff9db; color: #e67e22; }
+        .is-leave { background: #fab1a0 !important; color: white; text-decoration: line-through; }
+        .summary-card { background: var(--card); padding: 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .stat-item { background: #f1f8e9; padding: 15px; border-radius: 12px; text-align: center; }
+        .stat-num { font-size: 1.5rem; font-weight: bold; color: #388e3c; display: block; }
+        .month-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="tab-bar">
+    <div class="tab-item active" onclick="switchTab(event, 'daily')">Daily Ritual 🌿</div>
+    <div class="tab-item" onclick="switchTab(event, 'weekly')">Weekly Recap 🍏</div>
+    <div class="tab-item" onclick="switchTab(event, 'monthly')">Monthly Recap 🍎</div>
+</div>
+
+<div class="container">
+    <div class="header">
+        <h1>My Ritual 🌳</h1>
+        <div id="display-date" style="font-size: 1rem; margin-top: 8px; font-weight: bold;"></div>
+    </div>
+
+    <div id="tab-daily">
+        <div id="app-tasks"></div>
+    </div>
+
+    <div id="tab-weekly" class="hidden">
+        <div class="summary-card">
+            <span class="section-name">📅 本週週期</span>
+            <div id="week-dates" style="font-size: 1.4rem; font-weight: bold; color: #556b2f; margin: 10px 0;"></div>
+            <span class="section-name">📊 本週累積成果</span>
+            <div class="stat-grid">
+                <div class="stat-item"><span>📖 讀書</span><span class="stat-num" id="w-study">0</span></div>
+                <div class="stat-item"><span>💼 工作</span><span class="stat-num" id="w-work">0</span></div>
+                <div class="stat-item"><span>🐝 雜項</span><span class="stat-num" id="w-misc">0</span></div>
+                <div class="stat-item"><span>👁️ 眼部</span><span class="stat-num" id="w-eye">0</span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-monthly" class="hidden">
+        <div class="summary-card">
+            <span class="section-name">🍎 2026 年度月報</span>
+            <div id="month-list"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sections = [
+        { name: "☀️ 早上", tasks: [{id:"m1", i:"📖"}, {id:"m2", i:"📖"}, {id:"m3", i:"💼"}, {id:"m4", i:"👁️"}] },
+        { name: "☕ 下午", tasks: [{id:"a1", i:"📖"}, {id:"a2", i:"📖"}, {id:"a3", i:"💼"}, {id:"a4", i:"👁️"}] },
+        { name: "🌙 晚上", tasks: [{id:"e1", i:"📖"}, {id:"e2", i:"📖"}, {id:"e3", i:"🐝"}, {id:"e4", i:"👁️"}] }
+    ];
+
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1;
+    const currentYear = 2026;
+
+    // 日期顯示
+    document.getElementById('display-date').innerText = now.toLocaleDateString('zh-TW', { month: 'long', day: 'numeric', weekday: 'long' });
+    
+    function updateWeekDates() {
+        let d = new Date();
+        d.setDate(d.getDate() - d.getDay() + 1);
+        let start = `${d.getMonth()+1}/${d.getDate()}`;
+        d.setDate(d.getDate() + 4);
+        let end = `${d.getMonth()+1}/${d.getDate()}`;
+        document.getElementById('week-dates').innerText = `${start} - ${end}`;
+        return `${currentYear}-W${Math.ceil(now.getDate() / 7)}`;
+    }
+
+    // 資料初始化
+    let userTasks = JSON.parse(localStorage.getItem('ritual_tasks')) || {};
+    let dailyStatus = JSON.parse(localStorage.getItem('ritual_daily_status')) || {};
+    let stats = JSON.parse(localStorage.getItem('ritual_stats_2026')) || {
+        weekId: updateWeekDates(),
+        w: {📖:0, 💼:0, 🐝:0, 👁️:0},
+        m: {} // 格式 { "2": {📖:0...} }
+    };
+
+    // 每週自動重置檢測
+    const thisWeekId = updateWeekDates();
+    if (stats.weekId !== thisWeekId) {
+        stats.w = {📖:0, 💼:0, 🐝:0, 👁️:0};
+        stats.weekId = thisWeekId;
+        dailyStatus = {}; // 新的一週也清空每日勾選
+        localStorage.setItem('ritual_daily_status', JSON.stringify({}));
+    }
+    if (!stats.m[currentMonth]) stats.m[currentMonth] = {📖:0, 💼:0, 🐝:0, 👁️:0};
+
+    function switchTab(e, tab) {
+        document.querySelectorAll('.tab-item').forEach(el => el.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        ['daily', 'weekly', 'monthly'].forEach(t => document.getElementById('tab-'+t).classList.add('hidden'));
+        document.getElementById('tab-'+tab).classList.remove('hidden');
+        if(tab === 'weekly') updateWeekStats();
+        if(tab === 'monthly') renderMonthly();
+    }
+
+    function renderTasks() {
+        const container = document.getElementById('app-tasks');
+        container.innerHTML = '';
+        sections.forEach(sec => {
+            let html = `<div class="section-box"><span class="section-name">${sec.name}</span>`;
+            sec.tasks.forEach(t => {
+                const status = dailyStatus[t.id] || 'pending';
+                const text = userTasks[t.id] || (t.i === '👁️' ? '眼部放鬆' : '點擊輸入任務');
+                html += `
+                <div class="task-card">
+                    <div class="task-info"><span class="task-icon">${t.i}</span>
+                    <input class="task-text" value="${text}" onchange="saveText('${t.id}', this.value)"></div>
+                    <div class="btns">
+                        <button class="done-btn ${status === 'done' ? 'is-done' : ''}" onclick="toggle('${t.id}', 'done', '${t.i}')">完成</button>
+                        <button class="leave-btn ${status === 'leave' ? 'is-leave' : ''}" onclick="toggle('${t.id}', 'leave')">請假</button>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML += html + `</div>`;
+        });
+    }
+
+    window.saveText = (id, val) => { userTasks[id] = val; localStorage.setItem('ritual_tasks', JSON.stringify(userTasks)); };
+
+    window.toggle = (id, type, icon) => {
+        const prev = dailyStatus[id];
+        if (prev === type) {
+            dailyStatus[id] = 'pending';
+            if (type === 'done') adj(icon, -1);
+        } else {
+            dailyStatus[id] = type;
+            if (type === 'done') adj(icon, 1);
+            if (prev === 'done') adj(icon, -1);
+        }
+        localStorage.setItem('ritual_daily_status', JSON.stringify(dailyStatus));
+        renderTasks();
+    };
+
+    function adj(icon, v) {
+        if (stats.w[icon] !== undefined) stats.w[icon] += v;
+        if (stats.m[currentMonth][icon] !== undefined) stats.m[currentMonth][icon] += v;
+        localStorage.setItem('ritual_stats_2026', JSON.stringify(stats));
+    }
+
+    function updateWeekStats() {
+        document.getElementById('w-study').innerText = stats.w['📖'];
+        document.getElementById('w-work').innerText = stats.w['💼'];
+        document.getElementById('w-misc').innerText = stats.w['🐝'];
+        document.getElementById('w-eye').innerText = stats.w['👁️'];
+    }
+
+    function renderMonthly() {
+        const list = document.getElementById('month-list');
+        list.innerHTML = '';
+        Object.keys(stats.m).sort((a,b)=>b-a).forEach(m => {
+            const d = stats.m[m];
+            list.innerHTML += `
+            <div style="margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+                <b style="color:#556b2f">${m}月成果</b>
+                <div style="display:flex; gap:15px; font-size:0.9rem; margin-top:5px;">
+                    <span>📖 ${d['📖']}</span><span>💼 ${d['💼']}</span><span>🐝 ${d['🐝']}</span><span>👁️ ${d['👁️']}</span>
+                </div>
+            </div>`;
+        });
+    }
+
+    renderTasks();
+</script>
+</body>
+</html>
